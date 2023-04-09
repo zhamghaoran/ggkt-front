@@ -80,6 +80,13 @@
       @size-change="changePageSize"
       @current-change="changeCurrentPage"
     />
+    <!-- 工具按钮 -->
+    <el-card class="operate-container" shadow="never">
+      <i class="el-icon-tickets" style="margin-top: 5px" />
+      <span style="margin-top: 5px">数据列表</span>
+      <el-button class="btn-add" style="margin-left: 10px;" @click="add()">添加</el-button>
+      <el-button class="btn-add" @click="batchRemove()">批量删除</el-button>
+    </el-card>
   </div>
 </template>
 <script>
@@ -93,13 +100,52 @@ export default {
       total: 0, // 总记录数
       page: 1, // 页码
       limit: 10, // 每页记录数
-      searchObj: {} // 查询条件
+      searchObj: {}, // 查询条件
+      multipleSelection: []// 批量删除选中的记录列表
     }
   },
   created() { // 页面渲染之前
     this.fetchData()
   },
   methods: { // 具体方法
+    // 批量删除的方法
+    batchRemove(idList) {
+      // 非空判断
+      if (this.multipleSelection.length === 0) {
+        this.$message.warning('请选择要删除的记录！')
+        return
+      }
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 点击确定，远程调用ajax
+        // 遍历selection，将id取出放入id列表
+        var idList = []
+        this.multipleSelection.forEach(item => {
+          idList.push(item.id)
+        })
+        // 调用api
+        return teacherApi.batchRemove(idList)
+      }).then((response) => {
+        this.fetchData()
+        this.$message.success(response.message)
+      }).catch(error => {
+        if (error === 'cancel') {
+          this.$message.info('取消删除')
+        }
+      })
+    },
+    // 复选框发生变化，调用方法，选中复选框内容传递
+    handleSelectionChange(selection) {
+      this.multipleSelection = selection
+
+    },
+    // 跳转到添加表单页面
+    add() {
+      this.$router.push({ path: '/vod/teacher/create' })
+    },
     fetchData() {
       // ajax
       teacherApi.pageList(this.page, this.limit, this.searchObj)

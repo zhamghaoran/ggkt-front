@@ -52,11 +52,22 @@ export default {
     }
   },
   created() {
-
+    // 获取路径中的id值，根据id查询得到数据
+    if (this.$route.params.id) {
+      const id = this.$route.params.id
+      this.fetchDateById(id)
+    }
   },
   methods: {
-    saveOrUpdate() {
-      // 添加
+    // 根据id查询讲师信息
+    fetchDateById(id) {
+      teacherApi.getTeacherById(id)
+        .then(response => {
+          this.teacher = response.data
+        })
+    },
+    // 添加
+    save() {
       teacherApi.saveTeacher(this.teacher)
         .then(response => {
           // 提示
@@ -67,6 +78,28 @@ export default {
           // 跳转回列表
           this.$router.push({ path: '/vod/teacher/list' })
         })
+    },
+    // 修改
+    update() {
+      teacherApi.updateTeacher(this.teacher)
+        .then(response => {
+          // 提示
+          this.$message({
+            type: 'success',
+            message: '修改成功!'
+          })
+          // 跳转回列表
+          this.$router.push({ path: '/vod/teacher/list' })
+        })
+    },
+    saveOrUpdate() {
+      // 添加
+      this.saveBtnDisabled = true
+      if (!this.teacher.id) {
+        this.save()
+      } else {
+        this.update()
+      }
     }
   }
 }
