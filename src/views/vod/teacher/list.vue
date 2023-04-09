@@ -5,13 +5,13 @@
     <el-card class="operate-container" shadow="never">
       <el-form :inline="true" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="searchObj.name" placeholder="讲师名"/>
+          <el-input v-model="searchObj.name" placeholder="讲师名" />
         </el-form-item>
 
         <el-form-item label="头衔">
           <el-select v-model="searchObj.level" clearable placeholder="头衔">
-            <el-option value="1" label="高级讲师"/>
-            <el-option value="0" label="首席讲师"/>
+            <el-option value="1" label="高级讲师" />
+            <el-option value="0" label="首席讲师" />
           </el-select>
         </el-form-item>
 
@@ -41,7 +41,7 @@
       stripe
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection"/>
+      <el-table-column type="selection" />
       <el-table-column
         label="#"
         width="50"
@@ -50,16 +50,16 @@
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="名称" width="80"/>
+      <el-table-column prop="name" label="名称" width="80" />
       <el-table-column label="头衔" width="90">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.level === 1" type="success" size="mini">高级讲师</el-tag>
           <el-tag v-if="scope.row.level === 0" size="mini">首席讲师</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="intro" label="简介"/>
-      <el-table-column prop="sort" label="排序" width="60"/>
-      <el-table-column prop="joinDate" label="入驻时间" width="160"/>
+      <el-table-column prop="intro" label="简介" />
+      <el-table-column prop="sort" label="排序" width="60" />
+      <el-table-column prop="joinDate" label="入驻时间" width="160" />
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
           <el-button type="text" size="mini" @click="removeById(scope.row.id)">删除</el-button>
@@ -104,8 +104,12 @@ export default {
       // ajax
       teacherApi.pageList(this.page, this.limit, this.searchObj)
         .then(response => {
+          console.log(response.data.records, response.data.total)
           this.list = response.data.records
           this.total = response.data.total
+          console.log(this.list, this.total)
+        }).catch(err => {
+          console.log(err)
         })
     },
     // 改变每页显示的记录数
@@ -121,6 +125,26 @@ export default {
     resetDate() {
       this.searchObj = {}
       this.fetchData()
+    },
+    // 讲师的删除
+    removeById(id) {
+      this.$confirm('此操作将永久删除该讲师信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        console.log(123)
+        teacherApi.removeTeacherId(id)
+          .then(response => {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.fetchData()
+          }).catch(err => {
+            console.log(err)
+          })
+      })
     }
   }
 }

@@ -13,6 +13,21 @@ export default {
       // 普通格式传递， 写法 params: searchObj
       data: searchObj
     })
+  },
+  // 讲师删除接口
+  removeTeacherId(id) {
+    return request({
+      url: `${api_name}/remove/${id}`,
+      method: 'delete'
+    })
+  },
+  // 讲师添加
+  saveTeacher(teacher) {
+    return request({
+      url: `${api_name}/saveTeacher`,
+      method: 'post',
+      data: teacher
+    })
   }
 }
 
