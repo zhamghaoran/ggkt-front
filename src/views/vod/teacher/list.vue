@@ -107,7 +107,8 @@ export default {
   created() { // 页面渲染之前
     this.fetchData()
   },
-  methods: { // 具体方法
+  methods: {
+    // 具体方法
     // 批量删除的方法
     batchRemove(idList) {
       // 非空判断
@@ -140,7 +141,6 @@ export default {
     // 复选框发生变化，调用方法，选中复选框内容传递
     handleSelectionChange(selection) {
       this.multipleSelection = selection
-
     },
     // 跳转到添加表单页面
     add() {
