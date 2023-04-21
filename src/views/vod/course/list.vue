@@ -10,12 +10,14 @@
           <el-select
             v-model="searchObj.subjectParentId"
             placeholder="请选择"
-            @change="subjectLevelOneChanged">
+            @change="subjectLevelOneChanged"
+          >
             <el-option
               v-for="subject in subjectList"
               :key="subject.id"
               :label="subject.title"
-              :value="subject.id"/>
+              :value="subject.id"
+            />
           </el-select>
 
           <!-- 二级分类 -->
@@ -24,7 +26,8 @@
               v-for="subject in subjectLevelTwoList"
               :key="subject.id"
               :label="subject.title"
-              :value="subject.id"/>
+              :value="subject.id"
+            />
           </el-select>
         </el-form-item>
 
@@ -36,12 +39,14 @@
         <el-form-item label="讲师">
           <el-select
             v-model="searchObj.teacherId"
-            placeholder="请选择讲师">
+            placeholder="请选择讲师"
+          >
             <el-option
               v-for="teacher in teacherList"
               :key="teacher.id"
               :label="teacher.name"
-              :value="teacher.id"/>
+              :value="teacher.id"
+            />
           </el-select>
         </el-form-item>
 
@@ -88,7 +93,7 @@
           {{ scope.row.param.teacherName }}
         </template>
       </el-table-column>
-      <el-table-column label="价格(元)" width="100" align="center" >
+      <el-table-column label="价格(元)" width="100" align="center">
         <template slot-scope="scope">
           <!-- {{ typeof '0' }}  {{ typeof 0 }} {{ '0' == 0 }} -->
           <!-- {{ typeof scope.row.price }}
@@ -104,9 +109,12 @@
           <el-tag v-else>{{ scope.row.price }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="课程状态" width="100" align="center" >
+      <el-table-column prop="status" label="课程状态" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status === 0 ? 'warning' : 'success'">{{ scope.row.status === 0 ? '未发布' : '已发布' }}</el-tag>
+          <el-tag :type="scope.row.status === 0 ? 'warning' : 'success'">{{
+              scope.row.status === 0 ? '未发布' : '已发布'
+            }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="发布时间" width="140" align="center">
@@ -118,15 +126,15 @@
       <el-table-column label="操作" width="210" align="center">
         <template slot-scope="scope">
           <router-link :to="'/vodcourse/course/info/'+scope.row.id">
-            <el-button type="text" icon="el-icon-edit" >修改</el-button>
+            <el-button type="text" icon="el-icon-edit">修改</el-button>
           </router-link>
           <router-link :to="'/vodcourse/course/chapter/'+scope.row.id">
-            <el-button type="text" icon="el-icon-edit" >编辑大纲</el-button>
+            <el-button type="text" icon="el-icon-edit">编辑大纲</el-button>
           </router-link>
           <router-link :to="'/vodcourse/course/chart/'+scope.row.id">
             <el-button type="text" icon="el-icon-edit">课程统计</el-button>
           </router-link>
-          <el-button type="text" icon="el-icon-delete" @click="removeById(scope.row.id)" >删除</el-button>
+          <el-button type="text" icon="el-icon-delete" @click="removeById(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -205,11 +213,6 @@ export default {
         this.searchObj.subjectId = ''
       })
     },
-
-    add() {
-      this.$router.push({ path: '/vodcourse/course/info' })
-    },
-
     // 每页记录数改变，size：回调参数，表示当前选中的“每页条数”
     changePageSize(size) {
       this.limit = size
@@ -227,6 +230,22 @@ export default {
       this.searchObj = {}
       this.subjectLevelTwoList = [] // 二级分类列表
       this.fetchData()
+    },
+    removeById(id) {
+      this.$confirm('此操作将永久删除该课程，以及该课程下的章节和视频，是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        return courseApi.removeById(id)
+      }).then(response => {
+        this.fetchData()
+        this.$message.success(response.message)
+      }).catch((response) => { // 失败
+        if (response === 'cancel') {
+          this.$message.info('取消删除')
+        }
+      })
     }
   }
 }
